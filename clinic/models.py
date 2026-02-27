@@ -20,10 +20,19 @@ class Doctor(models.Model):
 
 
 class Appointment(models.Model):
+    PENDING = 'Pending'
+    DONE = 'Done'
+    STATUS_CHOICES = [
+        (PENDING, 'Pending'),
+        (DONE, 'Done'),
+    ]
+
+
+    
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     date_of_appointment = models.DateTimeField()
-    status = models.CharField(max_length=99)
+    status = models.CharField(max_length=99, choices=STATUS_CHOICES, default=PENDING)
 
     def __str__(self):
         return f"{self.patient} - {self.doctor}"

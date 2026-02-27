@@ -1,3 +1,8 @@
+import environ
+
+env = environ.Env()
+environ.Env.read_env()  # Read the .env file
+
 """
 Django settings for clinic_system project.
 
@@ -40,6 +45,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'clinic',
+    'corsheaders',  # 👈 add this
 ]
 
 MIDDLEWARE = [
@@ -50,6 +56,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # 👈 add this
+    'django.middleware.common.CommonMiddleware',  # 👈 add this
 ]
 
 ROOT_URLCONF = 'clinic_system.urls'
@@ -57,10 +65,11 @@ ROOT_URLCONF = 'clinic_system.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],  # 👈 add this
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -76,10 +85,7 @@ WSGI_APPLICATION = 'clinic_system.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': env.db()  # This will use the DATABASE_URL from .env file
 }
 
 
@@ -118,3 +124,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000", ]
