@@ -12,9 +12,7 @@ import AppointmentList from "./component/AppointmentList";
 const App: React.FC = () => {
   // Patient State
   const [patients, setPatients] = useState<Patient[]>([]);
-  const [patientName, setPatientName] = useState<string>("");
-  const [phoneNumber, setPhoneNumber] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
+  // (Removed patientName, phoneNumber, and email states since PatientList handles them now)
 
   // Doctor State
   const [doctors, setDoctors] = useState<Doctor[]>([]);
@@ -66,13 +64,10 @@ const App: React.FC = () => {
     fetchAppointments();
   }, []);
 
-  // Handle Patient Creation
-  const handleCreatePatient = async () => {
+  // Handle Patient Creation (Updated to accept data from PatientList)
+  const handleCreatePatient = async (newPatient: { name: string; email: string; phone_number: string }) => {
     try {
-      await createPatients({ name: patientName, phone_number: phoneNumber, email: email });
-      setPatientName("");
-      setPhoneNumber("");
-      setEmail("");
+      await createPatients(newPatient);
       fetchPatients();
     } catch (error) {
       console.error("Error creating patient", error);
@@ -184,117 +179,101 @@ const App: React.FC = () => {
     }
   };
 
+  // Notice how the max-width is removed here to allow the modern design to breathe
   return (
-    <div style={{ padding: "40px", maxWidth: "500px", margin: "0 auto" }}>
-      <h2>Patient CRUD (TypeScript)</h2>
-      <div style={{ marginBottom: "20px" }}>
-        <input
-          type="text"
-          value={patientName}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPatientName(e.target.value)}
-          placeholder="Enter Patient Name..."
-          style={{ marginRight: "10px" }}
-        />
-        <input
-          type="text"
-          value={phoneNumber}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPhoneNumber(e.target.value)}
-          placeholder="Enter Patient Phone Number..."
-          style={{ marginRight: "10px" }}
-        />
-        <input
-          type="text"
-          value={email}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-          placeholder="Enter Patient Email..."
-          style={{ marginRight: "10px" }}
-        />
-        <button onClick={handleCreatePatient}>Add Patient</button>
+    <div style={{ padding: "40px", margin: "0 auto", backgroundColor: "#f9fafb", minHeight: "100vh" }}>
+      
+      {/* The modern Patient List with the integrated form */}
+      <PatientList 
+        patients={patients} 
+        onToggle={handleTogglePatient} 
+        onDelete={handleDeletePatient} 
+        onAddPatient={handleCreatePatient} 
+      />
+
+      {/* --- OLDER SECTIONS BELOW --- */}
+      <div style={{ maxWidth: "500px", margin: "40px auto 0" }}>
+        <h2>Doctor CRUD (TypeScript)</h2>
+        <div style={{ marginBottom: "20px" }}>
+          <input
+            type="text"
+            value={doctorName}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDoctorName(e.target.value)}
+            placeholder="Enter Doctor Name..."
+            style={{ marginRight: "10px" }}
+          />
+          <input
+            type="text"
+            value={doctorPhoneNumber}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDoctorPhoneNumber(e.target.value)}
+            placeholder="Enter Doctor Phone Number..."
+            style={{ marginRight: "10px" }}
+          />
+          <input
+            type="text"
+            value={doctorEmail}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDoctorEmail(e.target.value)}
+            placeholder="Enter Doctor Email..."
+            style={{ marginRight: "10px" }}
+          />
+          <button onClick={handleCreateDoctor}>Add Doctor</button>
+        </div>
+
+        <DoctorList doctor={doctors} onToggle={handleToggleDoctor} onDelete={handleDeleteDoctor} />
+
+        <h2 style={{ marginTop: "40px" }}>Appointment CRUD (TypeScript)</h2>
+        <div style={{ marginBottom: "20px" }}>
+          {/* Patient Dropdown */}
+          <select
+            value={appointmentPatient}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setAppointmentPatient(e.target.value)}
+            style={{ marginRight: "10px" }}
+          >
+            <option value="">Select Patient</option>
+            {patients.map((patient) => (
+              <option key={patient.id} value={patient.id}>
+                {patient.name}
+              </option>
+            ))}
+          </select>
+
+          {/* Doctor Dropdown */}
+          <select
+            value={appointmentDoctor}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setAppointmentDoctor(e.target.value)}
+            style={{ marginRight: "10px" }}
+          >
+            <option value="">Select Doctor</option>
+            {doctors.map((doctor) => (
+              <option key={doctor.id} value={doctor.id}>
+                {doctor.name}
+              </option>
+            ))}
+          </select>
+
+          {/* Date Picker */}
+          <input
+            type="date"
+            value={appointmentDate}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAppointmentDate(e.target.value)}
+            style={{ marginRight: "10px" }}
+          />
+
+          {/* Status Dropdown */}
+          <select
+            value={appointmentStatus}
+            onChange={(e) => setAppointmentStatus(e.target.value)}
+            style={{ marginRight: "10px" }}
+          >
+            <option value="Pending">Pending</option>
+            <option value="Done">Done</option>
+          </select>
+
+          <button onClick={handleCreateAppointment}>Add Appointment</button>
+        </div>
+
+        <AppointmentList appointments={appointments} onToggle={() => {}} onDelete={() => {}} />
       </div>
-
-      <PatientList patients={patients} onToggle={handleTogglePatient} onDelete={handleDeletePatient} />
-
-      <h2>Doctor CRUD (TypeScript)</h2>
-      <div style={{ marginBottom: "20px" }}>
-        <input
-          type="text"
-          value={doctorName}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDoctorName(e.target.value)}
-          placeholder="Enter Doctor Name..."
-          style={{ marginRight: "10px" }}
-        />
-        <input
-          type="text"
-          value={doctorPhoneNumber}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDoctorPhoneNumber(e.target.value)}
-          placeholder="Enter Doctor Phone Number..."
-          style={{ marginRight: "10px" }}
-        />
-        <input
-          type="text"
-          value={doctorEmail}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDoctorEmail(e.target.value)}
-          placeholder="Enter Doctor Email..."
-          style={{ marginRight: "10px" }}
-        />
-        <button onClick={handleCreateDoctor}>Add Doctor</button>
-      </div>
-
-      <DoctorList doctor={doctors} onToggle={handleToggleDoctor} onDelete={handleDeleteDoctor} />
-
-
-     <h2>Appointment CRUD (TypeScript)</h2>
-      <div style={{ marginBottom: "20px" }}>
-        {/* Patient Dropdown */}
-        <select
-          value={appointmentPatient}
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setAppointmentPatient(e.target.value)}
-          style={{ marginRight: "10px" }}
-        >
-          <option value="">Select Patient</option>
-          {patients.map((patient) => (
-            <option key={patient.id} value={patient.id}>
-              {patient.name}
-            </option>
-          ))}
-        </select>
-
-        {/* Doctor Dropdown */}
-        <select
-          value={appointmentDoctor}
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setAppointmentDoctor(e.target.value)}
-          style={{ marginRight: "10px" }}
-        >
-          <option value="">Select Doctor</option>
-          {doctors.map((doctor) => (
-            <option key={doctor.id} value={doctor.id}>
-              {doctor.name}
-            </option>
-          ))}
-        </select>
-
-        {/* Date Picker */}
-        <input
-          type="date"
-          value={appointmentDate}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAppointmentDate(e.target.value)}
-          style={{ marginRight: "10px" }}
-        />
-
-        {/* Status Dropdown */}
-        <select
-          value={appointmentStatus}
-          onChange={(e) => setAppointmentStatus(e.target.value)}
-          style={{ marginRight: "10px" }}
-        >
-          <option value="Pending">Pending</option>
-          <option value="Done">Done</option>
-        </select>
-
-        <button onClick={handleCreateAppointment}>Add Appointment</button>
-      </div>
-
-      <AppointmentList appointments={appointments} onToggle={() => {}} onDelete={() => {}} />
     </div>
   );
 };

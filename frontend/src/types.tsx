@@ -14,8 +14,8 @@ export interface Doctor{
 
 export interface Appointment{
     date_of_appointment: string;
-    patient: string;
-    doctor: string;
+    patient: number;
+    doctor: number;
     status: string;
     id: number;
 }

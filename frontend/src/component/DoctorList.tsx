@@ -84,7 +84,9 @@ const DoctorList: React.FC<Props> = ({ doctor, onToggle, onDelete }) => {
                   marginRight: "10px",
                 }}
               >
-                {doctor.name} - {doctor.email} - {doctor.phone_number}
+                name: {doctor.name} <br></br>
+                email: {doctor.email} <br></br>
+                number: {doctor.phone_number}
               </span>
               <button onClick={() => handleEdit(doctor)} style={{ marginRight: "5px" }}>
                 Edit
